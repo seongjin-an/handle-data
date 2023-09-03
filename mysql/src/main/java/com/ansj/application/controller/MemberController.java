@@ -1,12 +1,15 @@
-package com.ansj.controller;
+package com.ansj.application.controller;
 
 import com.ansj.domain.member.dto.MemberDto;
+import com.ansj.domain.member.dto.MemberNicknameHistoryDto;
 import com.ansj.domain.member.dto.RegisterMemberCommand;
 import com.ansj.domain.member.entity.Member;
 import com.ansj.domain.member.service.MemberReadService;
 import com.ansj.domain.member.service.MemberWriteService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -29,6 +32,17 @@ public class MemberController {
     @GetMapping("/members/{id}")
     public MemberDto getMember(@PathVariable Long id) {
         return memberReadService.getMember(id);
+    }
+
+    @PostMapping("/{id}/name")
+    public MemberDto changeNickname(@PathVariable Long id, @RequestBody String nickname) {// 큰따옴표 없이 nickname 보내
+        memberWriteService.changeNickname(id, nickname);
+        return memberReadService.getMember(id);
+    }
+
+    @GetMapping("/{memberId}/nickname-histories")
+    public List<MemberNicknameHistoryDto> getNicknameHistories(@PathVariable Long memberId) {
+        return memberReadService.getNicknameHistories(memberId);
     }
 
 }
