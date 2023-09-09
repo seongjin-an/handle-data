@@ -49,6 +49,48 @@ create index POST__index_member_id
 
 create index POST__index_created_date
     on POST (createdDate);
+create index POST__index_member_id_created_date
+    on POST (memberId, createdDate);
 
 
+# --------------------------------------------------------------------------------------
+select count(*)
+from POST;
 
+
+SELECT createdDate, memberId, count(id) as count
+FROM POST
+WHERE memberId = 3 AND createdDate BETWEEN '2022-01-21' AND '2022-02-01'
+GROUP BY createdDate, memberId;
+
+SELECT createdDate, memberId, count(id) as count
+FROM POST use index (POST__index_member_id)
+WHERE memberId = 0 AND createdDate BETWEEN '2022-01-21' AND '2022-02-01'
+GROUP BY createdDate, memberId;
+
+create index POST__index_member_id
+    on POST (memberId);
+
+create index POST__index_created_date
+    on POST (createdDate);
+create index POST__index_member_id_created_date
+    on POST (memberId, createdDate);
+
+drop index POST__index_member_id on POST;
+drop index POST__index_created_date on POST;
+drop index POST__index_member_id_created_date on POST;
+
+
+select count(distinct createdDate)
+from POST;
+
+explain SELECT createdDate, memberId, count(id) as count
+        FROM POST use index (POST__index_created_date)
+        WHERE memberId = 3 AND createdDate BETWEEN '2022-01-21' AND '2022-02-01'
+        GROUP BY createdDate, memberId;
+
+
+explain SELECT createdDate, memberId, count(id) as count
+        FROM POST use index (POST__index_member_id_created_date)
+        WHERE memberId = 3 AND createdDate BETWEEN '2022-01-21' AND '2022-02-01'
+        GROUP BY createdDate, memberId;
