@@ -1,4 +1,4 @@
-package com.ansj.domain;
+package com.ansj.util;
 
 import org.springframework.data.domain.Sort;
 
