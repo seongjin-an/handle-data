@@ -2,8 +2,12 @@ package com.ansj.domain.post.service;
 
 import com.ansj.domain.post.dto.DailyPostCount;
 import com.ansj.domain.post.dto.DailyPostCountRequest;
+import com.ansj.domain.post.entity.Post;
 import com.ansj.domain.post.repository.PostRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -23,6 +27,10 @@ public class PostReadService {
             group by createdDate, memberId
          */
         return postRepository.groupByCreatedDate(request);
+    }
+
+    public Page<Post> getPosts(Long memberId, Pageable pageable) {
+        return postRepository.findAllByMemberId(memberId, pageable);
     }
 
 }
