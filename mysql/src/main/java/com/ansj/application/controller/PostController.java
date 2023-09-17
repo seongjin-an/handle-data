@@ -1,5 +1,6 @@
 package com.ansj.application.controller;
 
+import com.ansj.application.usecase.CreatePostUsecase;
 import com.ansj.application.usecase.GetTimelinePostUsecase;
 import com.ansj.domain.post.dto.DailyPostCount;
 import com.ansj.domain.post.dto.DailyPostCountRequest;
@@ -25,10 +26,12 @@ public class PostController {
     final private PostWriteService postWriteService;
     final private PostReadService postReadService;
     final private GetTimelinePostUsecase getTimelinePostUsecase;
+    final private CreatePostUsecase createPostUsecase;
 
     @PostMapping
     public Long create(PostCommand command) {
-        return postWriteService.create(command);
+//        return postWriteService.create(command);
+        return createPostUsecase.execute(command);
     }
 
     @GetMapping("/daily-post-counts")
@@ -69,7 +72,8 @@ public class PostController {
             @PathVariable Long memberId,
             CursorRequest cursorRequest
     ) {
-        return getTimelinePostUsecase.execute(memberId, cursorRequest);
+//        return getTimelinePostUsecase.execute(memberId, cursorRequest);
+        return getTimelinePostUsecase.executeByTimeline(memberId, cursorRequest);
     }
 
 }

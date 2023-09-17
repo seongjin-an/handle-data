@@ -94,3 +94,15 @@ explain SELECT createdDate, memberId, count(id) as count
         FROM POST use index (POST__index_member_id_created_date)
         WHERE memberId = 3 AND createdDate BETWEEN '2022-01-21' AND '2022-02-01'
         GROUP BY createdDate, memberId;
+
+
+
+
+create table Timeline
+(
+    id int auto_increment,
+    memberId int not null,
+    postId int not null,
+    createdAt datetime not null,
+    constraint Timeline_id_uindex primary key(id)
+);
