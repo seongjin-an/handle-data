@@ -17,7 +17,7 @@ public class MemberWriteService {
 
     final private MemberNicknameHistoryRepository memberNicknameHistoryRepository;
 
-    @Transactional
+
     public Member register(RegisterMemberCommand command) {
         /* 수도코드
             목표 - 회원정보(이메일, 닉네임, 생년월일)를 등록한다.
@@ -26,12 +26,18 @@ public class MemberWriteService {
             Member member = Member.of(memgerRegisterCommand)
             memberRepository.save(member)
          */
+        return getMember(command);
+    }
+
+    @Transactional
+    private Member getMember(RegisterMemberCommand command) {
         Member member = Member.builder()
                 .nickname(command.nickname())
                 .email(command.email())
                 .birthday(command.birthdate())
                 .build();
         Member savedMember = memberRepository.save(member);
+        double result = 0 / 0;
         saveMemberNicknameHistory(savedMember);
         return savedMember;
     }
