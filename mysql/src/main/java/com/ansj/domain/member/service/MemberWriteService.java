@@ -7,6 +7,7 @@ import com.ansj.domain.member.repository.MemberNicknameHistoryRepository;
 import com.ansj.domain.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -16,6 +17,7 @@ public class MemberWriteService {
 
     final private MemberNicknameHistoryRepository memberNicknameHistoryRepository;
 
+    @Transactional
     public Member register(RegisterMemberCommand command) {
         /* 수도코드
             목표 - 회원정보(이메일, 닉네임, 생년월일)를 등록한다.
