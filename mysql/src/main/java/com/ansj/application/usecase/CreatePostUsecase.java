@@ -7,6 +7,7 @@ import com.ansj.domain.post.service.PostWriteService;
 import com.ansj.domain.post.service.TimelineWriteService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -18,6 +19,7 @@ public class CreatePostUsecase {
 
     final private TimelineWriteService timelineWriteService;
 
+    @Transactional
     public Long execute(PostCommand postCommand) {
         var postId = postWriteService.create(postCommand);
 
