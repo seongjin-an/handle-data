@@ -1,8 +1,10 @@
 package com.ansj.domain.post.service;
 
+import com.ansj.domain.member.dto.PostDto;
 import com.ansj.domain.post.dto.DailyPostCount;
 import com.ansj.domain.post.dto.DailyPostCountRequest;
 import com.ansj.domain.post.entity.Post;
+import com.ansj.domain.post.repository.PostLikeRepository;
 import com.ansj.domain.post.repository.PostRepository;
 import com.ansj.util.CursorRequest;
 import com.ansj.util.PageCursor;
@@ -21,6 +23,8 @@ public class PostReadService {
 
     final private PostRepository postRepository;
 
+    final private PostLikeRepository postLikeRepository;
+
     public List<DailyPostCount> getDailyPostCount(DailyPostCountRequest request) {
         /*
             반홥 값 -> 리스트 [일자, 작성회원, 작성 게시물 횟수]
@@ -32,8 +36,18 @@ public class PostReadService {
         return postRepository.groupByCreatedDate(request);
     }
 
-    public Page<Post> getPosts(Long memberId, Pageable pageable) {
-        return postRepository.findAllByMemberId(memberId, pageable);
+    public Page<PostDto> getPosts(Long memberId, Pageable pageable) {
+        return postRepository.findAllByMemberId(memberId, pageable).map(this::toDto);
+    }
+
+    private PostDto toDto(Post post) {
+        return new PostDto(
+                post.getId(), post.getContents(), post.getCreatedAt(), postLikeRepository.count(post.getId())
+        );
+    }
+
+    public Post getPost(Long postId) {
+        return postRepository.findById(postId, false).orElseThrow();
     }
 
     public PageCursor<Post> getPosts(Long memberId, CursorRequest cursorRequest) {

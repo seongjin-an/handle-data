@@ -1,7 +1,9 @@
 package com.ansj.application.controller;
 
+import com.ansj.application.usecase.CreatePostLikeUsecase;
 import com.ansj.application.usecase.CreatePostUsecase;
 import com.ansj.application.usecase.GetTimelinePostUsecase;
+import com.ansj.domain.member.dto.PostDto;
 import com.ansj.domain.post.dto.DailyPostCount;
 import com.ansj.domain.post.dto.DailyPostCountRequest;
 import com.ansj.domain.post.dto.PostCommand;
@@ -27,6 +29,7 @@ public class PostController {
     final private PostReadService postReadService;
     final private GetTimelinePostUsecase getTimelinePostUsecase;
     final private CreatePostUsecase createPostUsecase;
+    final private CreatePostLikeUsecase createPostLikeUsecase;
 
     @PostMapping
     public Long create(PostCommand command) {
@@ -49,7 +52,7 @@ public class PostController {
     }
      */
     @GetMapping("/members/{memberId}")
-    public Page<Post> getPosts(
+    public Page<PostDto> getPosts(
             @PathVariable Long memberId,
 //            @RequestParam Integer page,
 //            @RequestParam Integer size
@@ -76,9 +79,15 @@ public class PostController {
         return getTimelinePostUsecase.executeByTimeline(memberId, cursorRequest);
     }
 
-    @PostMapping("/{postId}/like")
+    @PostMapping("/{postId}/like/v1")
     public void likePost(@PathVariable Long postId) {
 //        postWriteService.likePost(postId);
         postWriteService.likePostByOptimisticLock(postId);
     }
+
+    @PostMapping("/{postId}/like/v2")
+    public void likePostV2(@PathVariable Long postId, @RequestParam Long memberId) {
+        createPostLikeUsecase.execute(postId, memberId);
+    }
+
 }
