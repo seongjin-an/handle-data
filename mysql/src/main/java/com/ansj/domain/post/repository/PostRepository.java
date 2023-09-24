@@ -20,6 +20,7 @@ import java.sql.ResultSet;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @RequiredArgsConstructor
 @Repository
@@ -34,6 +35,7 @@ public class PostRepository {
             .contents(resultSet.getString("contents"))
             .createdDate(resultSet.getObject("createdDate", LocalDate.class))
             .createdAt(resultSet.getObject("createdAt", LocalDateTime.class))
+            .likeCount(resultSet.getLong("likeCount"))
             .build();
 
     final static private RowMapper<DailyPostCount> DAILY_POST_COUNT_MAPPER = (ResultSet resultSet, int rowNum)
@@ -71,6 +73,18 @@ public class PostRepository {
         var posts = namedParameterJdbcTemplate.query(sql, params, ROW_MAPPER);
 
         return new PageImpl(posts, pageable, getCount(memberId));
+    }
+
+    public Optional<Post> findById(Long postId, Boolean requiredLock) {
+        var sql = String.format("""
+                SELECT * FROM %s WHERE id = :postId
+                """, Table);
+        if (requiredLock) {
+            sql += " FOR UPDATE";
+        }
+        var params = new MapSqlParameterSource().addValue("postId",postId);
+        Post nullablePost = namedParameterJdbcTemplate.queryForObject(sql, params, ROW_MAPPER);
+        return Optional.ofNullable(nullablePost);
     }
 
     private Long getCount(Long memberId) {
@@ -163,7 +177,8 @@ public class PostRepository {
         if (post.getId() == null)
             return insert(post);
         // 가정은 코드로 작성해주자. 가정이 없다면, 예외가 터지지 않을 경우 버그 잡기가 굉장히 어려워짐.
-        throw new UnsupportedOperationException("Post는 갱신을 지원하지 않습니다.");
+//        throw new UnsupportedOperationException("Post는 갱신을 지원하지 않습니다.");
+        return update(post);
     }
 
     private Post insert(Post post) {
@@ -194,5 +209,16 @@ public class PostRepository {
                 .map(BeanPropertySqlParameterSource::new)
                 .toArray(SqlParameterSource[]::new);
         namedParameterJdbcTemplate.batchUpdate(sql, params);
+    }
+
+    private Post update(Post post) {
+        var sql = String.format("""
+                UPDATE %s 
+                SET memberId = :memberId, contents = :contents, createdDate = :createdDate, createdAt = :createdAt, likeCount = :likeCount
+                WHERE id = :id
+                """, Table);
+        SqlParameterSource params = new BeanPropertySqlParameterSource(post);
+        namedParameterJdbcTemplate.update(sql, params);
+        return post;
     }
 }
